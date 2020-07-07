@@ -264,21 +264,25 @@ colsoc$p58.interescolegiarse <- factor(colsoc$p58.interescolegiarse, levels = c(
 label(colsoc$p58.interescolegiarse) <- "P58. ¿Es de su interés asociarse al Colegio de Sociólogas y Sociólogos de Chile A.G.?"
 
 colsoc <- colsoc[c(59:116)]
-
-#CSV
-write.csv2(colsoc,"/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.csv", row.names = TRUE)
-
-#SPSS (SAV)
-library(haven)
-write_sav(colsoc, "BDcolsoc.sav")
-
-#SPSS (TXT+SPS)
-library(foreign)
-write.foreign(colsoc, "/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.txt", "/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.sps",   package="SPSS")
-
-#STATA
-write.dta(colsoc,"/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.dta")
 ```
 
+```{r, include=FALSE}
+#CSV
+#write.csv2(colsoc,"/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.csv", row.names = TRUE)
 
+#SPSS (SAV)
+#library(haven)
+#write_sav(colsoc, "BDcolsoc.sav")
+
+#SPSS (TXT+SPS)
+#library(foreign)
+#write.foreign(colsoc, "/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.txt", "/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.sps",   package="SPSS")
+
+#STATA
+#write.dta(colsoc,"/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.dta")
+```
+
+```{r}
+describe(colsoc)
+```
 
