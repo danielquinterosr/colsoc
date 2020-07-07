@@ -1,0 +1,284 @@
+---
+title: "Encuesta ColSoc 2020"
+author: "Daniel Quinteros"
+date: "6/7/2020"
+output: html_document
+---
+
+```{r}
+library(mosaic)
+library(Hmisc)
+
+colsoc <- read.csv("/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/colsoc2020.csv", header=TRUE, sep=";")
+
+colsoc$p1.trabajo <- as.factor(colsoc$Indique.si.durante.la.semana.pasada..es.decir..entre.lunes.y.domingo..trabajó.remuneradamente.al.menos.una.hora.en.alguna.de.las.siguientes.actividades.)
+label(colsoc$p1.trabajo) <- "P1. Indique si durante la semana pasada, es decir, entre lunes y domingo ¿trabajó remuneradamente al menos una hora en alguna de las siguientes actividades?"
+
+colsoc$p2.horastrabajo <- as.numeric(colsoc$Si.trabajó.durante.la.semana.pasada...cuántas.horas.trabajó.en.total.)
+label(colsoc$p2.horastrabajo) <- "P2. Si trabajó durante la semana pasada ¿cuántas horas trabajó en total?"
+
+colsoc$Si.está.trabajando..qué.tipo.de.contrato.posees.en.la.actualidad.[colsoc$Si.está.trabajando..qué.tipo.de.contrato.posees.en.la.actualidad.==""] <- NA
+colsoc$p3.contrato <- as.factor(colsoc$Si.está.trabajando..qué.tipo.de.contrato.posees.en.la.actualidad.)
+label(colsoc$p3.contrato) <- "P3. Si está trabajando ¿qué tipo de contrato posees en la actualidad?"
+
+colsoc$p4.otrocontrato <- as.character(colsoc$Other) #pregunta abierta
+label(colsoc$p4.otrocontrato) <- "P4. Otro tipo de contrato"
+
+colsoc$Al.momento.de.recibir.su.mayor.ingreso..usted.[colsoc$Al.momento.de.recibir.su.mayor.ingreso..usted.==""] <- NA
+colsoc$p5.pago <- as.factor(colsoc$Al.momento.de.recibir.su.mayor.ingreso..usted.)
+label(colsoc$p5.pago) <- "P5. Al momento de recibir su mayor ingreso ¿usted?"
+
+colsoc$X.A.qué.se.dedica.principalmente.la.empresa.o.institución.que.le.genera.su.mayor.fuente.de.ingresos.[colsoc$X.A.qué.se.dedica.principalmente.la.empresa.o.institución.que.le.genera.su.mayor.fuente.de.ingresos.==""] <- NA
+colsoc$p6.empleador <- as.factor(colsoc$X.A.qué.se.dedica.principalmente.la.empresa.o.institución.que.le.genera.su.mayor.fuente.de.ingresos.)
+label(colsoc$p6.empleador) <- "P6. ¿A qué se dedica principalmente la empresa o institución que le genera su mayor fuente de ingresos?"
+
+colsoc$p7.otroempleador <- as.character(colsoc$Other.1) #pregunta abierta
+label(colsoc$p7.otroempleador) <- "P7. Otra actividad empleador"
+
+colsoc$Durante.la.semana.pasada..dónde.realizó.principalmente.sus.actividades.[colsoc$Durante.la.semana.pasada..dónde.realizó.principalmente.sus.actividades.==""] <- NA
+colsoc$p8.lugartrabajo <- as.factor(colsoc$Durante.la.semana.pasada..dónde.realizó.principalmente.sus.actividades.)
+label(colsoc$p8.lugartrabajo) <- "P8. Durante la semana pasada ¿dónde realizó principalmente sus actividades?"
+
+colsoc$p9.otrolugartrabajo <- as.character(colsoc$Other.2) #pregunta abierta
+label(colsoc$p9.otrolugartrabajo) <- "P9. Otro lugar de trabajo"
+
+colsoc$Desde.el.18.de.octubre.2019..tus.ingresos.respecto.a.los.tres.meses.anteriores.[colsoc$Desde.el.18.de.octubre.2019..tus.ingresos.respecto.a.los.tres.meses.anteriores.==""] <- NA
+colsoc$p10.ingresosoctubre <- factor(colsoc$Desde.el.18.de.octubre.2019..tus.ingresos.respecto.a.los.tres.meses.anteriores., levels=c("Disminuyeron totalmente","Disminuyeron levemente","Se mantuvieron igual","Aumentaron levemente","Aumentaron"))
+label(colsoc$p10.ingresosoctubre) <- "P10. Desde el 18 de octubre 2019 ¿tus ingresos respecto a los tres meses anteriores?"
+
+colsoc$p11.cambiooctubre <- as.character(colsoc$X.Tuvo.que.cambiar.por.completo.de.actividad.económica.como.consecuencia.del.estallido.social.)
+colsoc$p11.cambiooctubre[colsoc$p11.cambiooctubre==0] <- "No"
+colsoc$p11.cambiooctubre[colsoc$p11.cambiooctubre==1] <- "Si"
+colsoc$p11.cambiooctubre <- factor(colsoc$p11.cambiooctubre, levels = c("No","Si"))
+label(colsoc$p11.cambiooctubre) <- "P11. ¿Tuvo que cambiar por completo de actividad económica como consecuencia del estallido social?"
+
+colsoc$Desde.que.comenzo.la.pandemia.Covid.19.en.marzo.de.2020..tus.ingresos.respecto.a.los.tres.meses.anteriores.[colsoc$Desde.que.comenzo.la.pandemia.Covid.19.en.marzo.de.2020..tus.ingresos.respecto.a.los.tres.meses.anteriores.==""] <- NA
+colsoc$p12.ingresocovid <- factor(colsoc$Desde.que.comenzo.la.pandemia.Covid.19.en.marzo.de.2020..tus.ingresos.respecto.a.los.tres.meses.anteriores.,levels=c("Disminuyeron totalmente","Disminuyeron levemente","Se mantuvieron igual","Aumentaron levemente","Aumentaron"))
+label(colsoc$p12.ingresocovid) <- "P12. Desde que comenzo la pandemia Covid 19 en marzo de 2020 ¿tus ingresos respecto a los tres meses anteriores?"
+
+colsoc$p13.cambiocovid <- as.character(colsoc$X.Tuvo.que.cambiar.por.completo.de.actividad.económica.como.consecuencia.del.Covid.19.)
+colsoc$p13.cambiocovid[colsoc$p13.cambiocovid==0] <- "No"
+colsoc$p13.cambiocovid[colsoc$p13.cambiocovid==1] <- "Si"
+colsoc$p13.cambiocovid <- factor(colsoc$p13.cambiocovid, levels = c("No","Si"))
+label(colsoc$p13.cambiocovid) <- "P13. ¿Tuvo que cambiar por completo de actividad económica como consecuencia del Covid 19?"
+
+colsoc$X.Cuál.es.tu.nivel.de.satisfacción.con.tu.actual.situacion.laboral.[colsoc$X.Cuál.es.tu.nivel.de.satisfacción.con.tu.actual.situacion.laboral.==""] <- NA
+colsoc$p14.satisfaccionlaboral <- factor(colsoc$X.Cuál.es.tu.nivel.de.satisfacción.con.tu.actual.situacion.laboral., levels=c("Muy insatisfecho","Insatisfecho","Indiferente","Satisfecho","Muy Satisfecho"))
+label(colsoc$p14.satisfaccionlaboral) <- "P14. ¿Cuál es tu nivel de satisfacción con tu actual situacion laboral?"
+
+colsoc$X.Cuál.es.tu.nivel.de.satisfacción.con.tu.actual.estado.de.salud.[colsoc$X.Cuál.es.tu.nivel.de.satisfacción.con.tu.actual.estado.de.salud.==""] <- NA
+colsoc$p15.satisfaccionsalud <- factor(colsoc$X.Cuál.es.tu.nivel.de.satisfacción.con.tu.actual.estado.de.salud., levels=c("Muy insatisfecho","Insatisfecho","Indiferente","Satisfecho","Muy Satisfecho"))
+label(colsoc$p15.satisfaccionsalud) <- "P15. ¿Cuál es tu nivel de satisfacción con tu actual estado de salud?"
+
+colsoc$X.Cuál.es.tu.nivel.de.satisfacción.con.su.bienestar.general.[colsoc$X.Cuál.es.tu.nivel.de.satisfacción.con.su.bienestar.general.==""] <- NA
+colsoc$p16.satisfacciongeneral <- factor(colsoc$X.Cuál.es.tu.nivel.de.satisfacción.con.su.bienestar.general., levels=c("Muy insatisfecho","Insatisfecho","Indiferente","Satisfecho","Muy Satisfecho"))
+label(colsoc$p16.satisfacciongeneral) <- "P16. ¿Cuál es tu nivel de satisfacción con su bienestar general?"
+
+colsoc$Todo.siguió.igual[colsoc$Todo.siguió.igual==""] <- NA
+colsoc$p17.octubre.igual <- as.factor(colsoc$Todo.siguió.igual)
+label(colsoc$p17.octubre.igual) <- "P17. Todo siguió igual (octubre)"
+
+colsoc$Perdí.mi.trabajo[colsoc$Perdí.mi.trabajo==""] <- NA
+colsoc$p18.octubre.pierdetrabajo <- as.factor(colsoc$Perdí.mi.trabajo)
+label(colsoc$p18.octubre.pierdetrabajo) <- "P18. Perdí mi trabajo (octubre)"
+
+colsoc$Encontré.trabajo[colsoc$Encontré.trabajo==""] <- NA
+colsoc$p19.octubre.encuentratrabajo <- as.factor(colsoc$Encontré.trabajo)
+label(colsoc$p19.octubre.encuentratrabajo) <- "P19. Encontré trabajo (octubre)"
+
+colsoc$Provocó.un.bajón.anímico[colsoc$Provocó.un.bajón.anímico==""] <- NA
+colsoc$p20.octubre.animo <- as.factor(colsoc$Provocó.un.bajón.anímico)
+label(colsoc$p20.octubre.animo) <- "P20. Provocó un bajón anímico (octubre)"
+
+colsoc$Trajo.conflictos.familiares[colsoc$Trajo.conflictos.familiares==""] <- NA
+colsoc$p21.octubre.familia <- as.factor(colsoc$Trajo.conflictos.familiares)
+label(colsoc$p21.octubre.familia) <- "P21. Trajo conflictos familiares (octubre)"
+
+colsoc$Afectó.mi.salud.corporal.y.o.mental[colsoc$Afectó.mi.salud.corporal.y.o.mental==""] <- NA
+colsoc$p22.octubre.salud <- as.factor(colsoc$Afectó.mi.salud.corporal.y.o.mental)
+label(colsoc$p22.octubre.salud) <- "P22. Afectó mi salud corporal y o mental (octubre)"
+
+colsoc$p23.octubre.otro <- as.character(colsoc$Other.3) #pregunta abierta
+label(colsoc$p23.octubre.otro) <- "P23. Otra consecuencia (octubre)"
+
+colsoc$Todo.siguió.igual.1[colsoc$Todo.siguió.igual.1==""] <- NA
+colsoc$p24.covid.igual <- as.factor(colsoc$Todo.siguió.igual.1)
+label(colsoc$p24.covid.igual) <- "P24. Todo siguió igual (covid)"
+
+colsoc$Perdí.mi.trabajo.1[colsoc$Perdí.mi.trabajo.1==""] <- NA
+colsoc$p25.covid.pierdetrabajo <- as.factor(colsoc$Perdí.mi.trabajo.1)
+label(colsoc$p25.covid.pierdetrabajo) <- "P25. Perdí mi trabajo (covid)"
+
+colsoc$Encontré.trabajo.1[colsoc$Encontré.trabajo.1==""] <- NA
+colsoc$p26.covid.encuentratrabajo <- as.factor(colsoc$Encontré.trabajo.1)
+label(colsoc$p26.covid.encuentratrabajo) <- "P26. Encontré trabajo (covid)"
+
+colsoc$Provocó.un.bajón.anímico.1[colsoc$Provocó.un.bajón.anímico.1==""] <- NA
+colsoc$p27.covid.animo <- as.factor(colsoc$Provocó.un.bajón.anímico.1)
+label(colsoc$p27.covid.animo) <- "P27. Provocó un bajón anímico (covid)"
+
+colsoc$Tuvo.consecuencias.emocionales[colsoc$Tuvo.consecuencias.emocionales==""] <- NA
+colsoc$p28.covid.emocional <- as.factor(colsoc$Tuvo.consecuencias.emocionales)
+label(colsoc$p28.covid.emocional) <- "P28. Tuvo consecuencias emocionales (covid)"
+
+colsoc$Afectó.mi.salud.corporal.y.o.mental.1[colsoc$Afectó.mi.salud.corporal.y.o.mental.1==""] <- NA
+colsoc$p29.covid.salud <- as.factor(colsoc$Afectó.mi.salud.corporal.y.o.mental.1)
+label(colsoc$p29.covid.salud) <- "P29. Afectó mi salud corporal y o mental (covid)"
+
+colsoc$p30.covid.otro <- as.character(colsoc$Other.4) #pregunta abierta
+label(colsoc$p30.covid.otro) <- "P30. Otra consecuencia (covid)"
+
+colsoc$p31.proyeccionlaboral <- as.character(colsoc$Qué.tipo.de.proyecciones.laborales.tienes.a.partir.de.tu.experiencia.y.en.el.área.de.la.sociología...Señalar.hasta.tres.conceptos..) #pregunta abierta
+label(colsoc$p31.proyeccionlaboral) <- "P31. Qué tipo de proyecciones laborales tienes a partir de tu experiencia y en el área de la sociología? Señalar hasta tres conceptos"
+
+colsoc$Metodologías.cualitativas[colsoc$Metodologías.cualitativas==""] <- NA
+colsoc$Metodologías.cualitativas[colsoc$Metodologías.cualitativas=="Nada de Interés."] <- "Nada"
+colsoc$Metodologías.cualitativas[colsoc$Metodologías.cualitativas=="Poco interés"] <- "Poco"
+colsoc$p32.cuali <- factor(colsoc$Metodologías.cualitativas, levels = c("Nada","Poco","Indiferente","Interesado","Muy interesado"))
+label(colsoc$p32.cuali) <- "P32. Metodologías cualitativas"
+
+colsoc$Metodologías.cuantitativas.[colsoc$Metodologías.cuantitativas.==""] <- NA
+colsoc$Metodologías.cuantitativas.[colsoc$Metodologías.cuantitativas.=="Nada de Interés."] <- "Nada"
+colsoc$Metodologías.cuantitativas.[colsoc$Metodologías.cuantitativas.=="Poco interés"] <- "Poco"
+colsoc$p33.cuanti <- factor(colsoc$Metodologías.cuantitativas.,levels = c("Nada","Poco","Indiferente","Interesado","Muy interesado"))
+label(colsoc$p33.cuanti) <- "P33. Metodologías cuantitativas"
+
+colsoc$Gestión.Pública[colsoc$Gestión.Pública==""] <- NA
+colsoc$Gestión.Pública[colsoc$Gestión.Pública=="Nada de Interés."] <- "Nada"
+colsoc$Gestión.Pública[colsoc$Gestión.Pública=="Poco interés"] <- "Poco"
+colsoc$p34.gestionpublica <- factor(colsoc$Gestión.Pública, levels = c("Nada","Poco","Indiferente","Interesado","Muy interesado"))
+label(colsoc$p34.gestionpublica) <- "P34. Gestión Pública"
+
+colsoc$Metodología.de.Intervención[colsoc$Metodología.de.Intervención==""] <- NA
+colsoc$Metodología.de.Intervención[colsoc$Metodología.de.Intervención=="Nada de Interés."] <- "Nada"
+colsoc$Metodología.de.Intervención[colsoc$Metodología.de.Intervención=="Poco interés"] <- "Poco"
+colsoc$p35.intervencion <- factor(colsoc$Metodología.de.Intervención, levels = c("Nada","Poco","Indiferente","Interesado","Muy interesado"))
+label(colsoc$p35.intervencion) <- "P35. Metodología de Intervención"
+
+colsoc$Diseño.y.evaluación.de.proyectos[colsoc$Diseño.y.evaluación.de.proyectos==""] <- NA
+colsoc$Diseño.y.evaluación.de.proyectos[colsoc$Diseño.y.evaluación.de.proyectos=="Nada de Interés."] <- "Nada"
+colsoc$Diseño.y.evaluación.de.proyectos[colsoc$Diseño.y.evaluación.de.proyectos=="Poco interés"] <- "Poco"
+colsoc$p36.proyectos <- factor(colsoc$Diseño.y.evaluación.de.proyectos, levels = c("Nada","Poco","Indiferente","Interesado","Muy interesado"))
+label(colsoc$p36.proyectos) <- "P36 Diseño y evaluación de proyectos"
+
+colsoc$Teoría.sociológica[colsoc$Teoría.sociológica==""] <- NA
+colsoc$Teoría.sociológica[colsoc$Teoría.sociológica=="Nada de Interés."] <- "Nada"
+colsoc$Teoría.sociológica[colsoc$Teoría.sociológica=="Poco interés"] <- "Poco"
+colsoc$p37.teoria <- factor(colsoc$Teoría.sociológica, levels = c("Nada","Poco","Indiferente","Interesado","Muy interesado"))
+label(colsoc$p37.teoria) <- "P37. Teoría sociológica"
+
+colsoc$Sociologías.en.general[colsoc$Sociologías.en.general==""] <- NA
+colsoc$Sociologías.en.general[colsoc$Sociologías.en.general=="Nada de Interés."] <- "Nada"
+colsoc$Sociologías.en.general[colsoc$Sociologías.en.general=="Poco interés"] <- "Poco"
+colsoc$p38.general <- factor(colsoc$Sociologías.en.general, levels = c("Nada","Poco","Indiferente","Interesado","Muy interesado"))
+label(colsoc$p38.general) <- "P38. Sociologías en general"
+
+colsoc$Utilización.de.softwares.de.análisis[colsoc$Utilización.de.softwares.de.análisis==""] <- NA
+colsoc$Utilización.de.softwares.de.análisis[colsoc$Utilización.de.softwares.de.análisis=="Nada de Interés."] <- "Nada"
+colsoc$Utilización.de.softwares.de.análisis[colsoc$Utilización.de.softwares.de.análisis=="Poco interés"] <- "Poco"
+colsoc$p39.software <- factor(colsoc$Utilización.de.softwares.de.análisis, levels = c("Nada","Poco","Indiferente","Interesado","Muy interesado"))
+label(colsoc$p39.software) <- "P39. Utilización de softwares de análisis"
+
+colsoc$Investigación.de.mercado[colsoc$Investigación.de.mercado==""] <- NA
+colsoc$Investigación.de.mercado[colsoc$Investigación.de.mercado=="Nada de Interés."] <- "Nada"
+colsoc$Investigación.de.mercado[colsoc$Investigación.de.mercado=="Poco interés"] <- "Poco"
+colsoc$p40.mercado <- factor(colsoc$Investigación.de.mercado, levels = c("Nada","Poco","Indiferente","Interesado","Muy interesado"))
+label(colsoc$p40.mercado) <- "P40. Investigación de mercado"
+
+colsoc$p41.otros <- as.character(colsoc$Otros.intereses) #pregunta abierta
+label(colsoc$p41.otros) <- "P41. Otros intereses"
+
+colsoc$p42.honorarios <- as.character(colsoc$Usted.curso.boletas.de.honorarios.durante.los.años.2018..2019.y.2020.)
+colsoc$p42.honorarios[colsoc$p42.honorarios==0] <- "No"
+colsoc$p42.honorarios[colsoc$p42.honorarios==1] <- "Si"
+colsoc$p42.honorarios <- factor(colsoc$p42.honorarios, levels = c("No","Si"))
+label(colsoc$p42.honorarios) <- "P42. Usted curso boletas de honorarios durante los años 2018, 2019 y 2020?"
+
+colsoc$p43.boletas2018 <- as.numeric(colsoc$Cuántas.boletas.emitió.durante.el.año.2018)
+label(colsoc$p43.boletas2018) <- "P43. Cuántas boletas emitió durante el año 2018"
+
+colsoc$p44.boletas2019 <- as.numeric(colsoc$Cuántas.boletas.emitió.durante.el.año.2019)
+label(colsoc$p44.boletas2019) <- "P44. Cuántas boletas emitió durante el año 2019"
+
+colsoc$p45.boletas2020 <- as.numeric(colsoc$Cuántas.boletas.emitió.durante.el.año.2020..antes.del.1.de.abril.)
+label(colsoc$p45.boletas2020) <- "P45. Cuántas boletas emitió durante el año 2020, antes del 1 de abril?"
+
+colsoc$p46.fuenteingreso2018 <- as.character(colsoc$X.Su.única.fuente.de.ingresos.durante.el.año.2018.fueron.las.boletas.de.honorarios.)
+colsoc$p46.fuenteingreso2018[colsoc$p46.fuenteingreso2018==0] <- "No"
+colsoc$p46.fuenteingreso2018[colsoc$p46.fuenteingreso2018==1] <- "Si"
+colsoc$p46.fuenteingreso2018 <- factor(colsoc$p46.fuenteingreso2018, levels = c("No","Si"))
+label(colsoc$p46.fuenteingreso2018) <- "P46. ¿Su única fuente de ingresos durante el año 2018 fueron las boletas de honorarios?"
+
+colsoc$p47.fuenteingreso2019 <- as.character(colsoc$X.Su.única.fuente.de.ingresos.durante.el.año.2019.fueron.las.boletas.de.honorarios.)
+colsoc$p47.fuenteingreso2019[colsoc$p47.fuenteingreso2019==0] <- "No"
+colsoc$p47.fuenteingreso2019[colsoc$p47.fuenteingreso2019==1] <- "Si"
+colsoc$p47.fuenteingreso2019 <- factor(colsoc$p47.fuenteingreso2019, levels = c("No","Si"))
+label(colsoc$p47.fuenteingreso2019) <- "P47. ¿Su única fuente de ingresos durante el año 2019 fueron las boletas de honorarios?"
+
+colsoc$p48.fuenteingreso2020 <- as.character(colsoc$X.Su.única.fuente.de.ingresos.durante.el.año.2020...antes.del.1.de.abril..fueron.las.boletas.de.honorarios.)
+colsoc$p48.fuenteingreso2020[colsoc$p48.fuenteingreso2020==0] <- "No"
+colsoc$p48.fuenteingreso2020[colsoc$p48.fuenteingreso2020==1] <- "Si"
+colsoc$p48.fuenteingreso2020 <- factor(colsoc$p48.fuenteingreso2020, levels = c("No","Si"))
+label(colsoc$p48.fuenteingreso2020) <- "P48. ¿Su única fuente de ingresos durante el año 2020,  antes del 1 de abril, fueron las boletas de honorarios?"
+
+colsoc$p49.afectohonorarios <- as.character(colsoc$De.aprobarse.una.ley.que.se.tramita.en.el.congreso.que.establece.beneficios.para.los.trabajadores.a.honorarios..que.requiere.cumplir.los.siguientes.requisitos......Haber.emitido.boletas.de.honorarios.en.a.lo.menos.cuatro.meses.continuos.o.discontinuos..de.los.12.meses.anteriores.al.1º.de.abril.de.2020..o.haber.emitido.boletas.de.honorarios.en.a.los.menos.8.meses..continuos.o.discontinuos..en.los.24.meses.anteriores.a.la.referida.fecha......Usted.estaría.afecto.al.beneficio.)
+colsoc$p49.afectohonorarios[colsoc$p49.afectohonorarios==0] <- "No"
+colsoc$p49.afectohonorarios[colsoc$p49.afectohonorarios==1] <- "Si"
+colsoc$p49.afectohonorarios <- factor(colsoc$p49.afectohonorarios, levels = c("No","Si"))
+label(colsoc$p49.afectohonorarios) <- "P49. De aprobarse una ley que se tramita en el congreso que establece beneficios para los trabajadores a honorarios, que requiere cumplir los siguientes requisitos, Haber emitido boletas de honorarios en a lo menos cuatro meses continuos o discontinuos, de los 12 meses anteriores al 1º de abril de 2020, o haber emitido boletas de honorarios en a los menos 8 meses, continuos o discontinuos, en los 24 meses anteriores a la referida fecha ¿Usted estaría afecto al beneficio?"
+
+colsoc$p50.gradoacademico <- factor(colsoc$X.Qué.grado.académico.posee., levels = c("Licenciado", "Magíster", "Doctorado", "Postdoctorado"))
+label(colsoc$p50.gradoacademico) <- "P50. ¿Qué grado académico posee?"
+
+colsoc$p51.titulo <- as.character(colsoc$Usted.obtuvo.el.título.profesional.de.sociólogo.)
+colsoc$p51.titulo[colsoc$p51.titulo==0] <- "No"
+colsoc$p51.titulo[colsoc$p51.titulo==1] <- "Si"
+colsoc$p51.titulo <- factor(colsoc$p51.titulo, levels = c("No","Si"))
+label(colsoc$p51.titulo) <- "P51. Usted obtuvo el título profesional de sociólogo?"
+
+colsoc$p52.universidad <- as.character(colsoc$X.De.qué.universidad.egresaste.) #pregunta abierta
+label(colsoc$p52.universidad) <- "P52. ¿De qué universidad egresaste?"
+
+colsoc$p53.comunaresidencia <- as.character(colsoc$Comuna.de.residencia) #pregunta abierta
+label(colsoc$p53.comunaresidencia) <- "P53. Comuna de residencia"
+
+colsoc$p54.comunatrabajo <- as.character(colsoc$Comuna.donde.trabaja) #pregunta abierta
+label(colsoc$p54.comunatrabajo) <- "P54. Comuna donde trabaja"
+
+colsoc$p55.edad <- as.numeric(colsoc$Edad)
+label(colsoc$p55.edad) <- "P55. Edad"
+
+colsoc$p56.genero <- as.factor(colsoc$Género)
+label(colsoc$p56.genero) <- "P56. Género"
+
+colsoc$p57.asociado <- as.character(colsoc$X.Estás.asociado.a.al.Colegio.de.Sociólogas.y.Sociólogos.de.Chile.A.G.)
+colsoc$p57.asociado[colsoc$p57.asociado==0] <- "No"
+colsoc$p57.asociado[colsoc$p57.asociado==1] <- "Si"
+colsoc$p57.asociado <- factor(colsoc$p57.asociado, levels = c("No","Si"))
+label(colsoc$p57.asociado) <- "P57. ¿Estás asociado a al Colegio de Sociólogas y Sociólogos de Chile A.G.?"
+
+colsoc$p58.interescolegiarse <- as.character(colsoc$X.Es.de.su.interés.asociarse.al.Colegio.de.Sociólogas.y.Sociólogos.de.Chile.A.G.)
+colsoc$p58.interescolegiarse[colsoc$p58.interescolegiarse==0] <- "No"
+colsoc$p58.interescolegiarse[colsoc$p58.interescolegiarse==1] <- "Si"
+colsoc$p58.interescolegiarse <- factor(colsoc$p58.interescolegiarse, levels = c("No","Si"))
+label(colsoc$p58.interescolegiarse) <- "P58. ¿Es de su interés asociarse al Colegio de Sociólogas y Sociólogos de Chile A.G.?"
+
+colsoc <- colsoc[c(59:116)]
+
+#CSV
+write.csv2(colsoc,"/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.csv", row.names = TRUE)
+
+#SPSS (SAV)
+library(haven)
+write_sav(colsoc, "BDcolsoc.sav")
+
+#SPSS (TXT+SPS)
+library(foreign)
+write.foreign(colsoc, "/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.txt", "/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.sps",   package="SPSS")
+
+#STATA
+write.dta(colsoc,"/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.dta")
+```
+
+
+
