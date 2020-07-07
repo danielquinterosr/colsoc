@@ -1,0 +1,2 @@
+# colsoc
+Encuesta Colegio Sociologxs
