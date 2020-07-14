@@ -11,6 +11,9 @@ library(Hmisc)
 
 colsoc <- read.csv("/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/colsoc2020.csv", header=TRUE, sep=";")
 
+colsoc$p1.trabajo <- as.character(colsoc$Indique.si.durante.la.semana.pasada..es.decir..entre.lunes.y.domingo..trabajó.remuneradamente.al.menos.una.hora.en.alguna.de.las.siguientes.actividades.)
+colsoc$p1.trabajo[colsoc$Other=="Estudiante de doctorado"] <- "Desempleado"
+colsoc$p1.trabajo[colsoc$Indique.si.durante.la.semana.pasada..es.decir..entre.lunes.y.domingo..trabajó.remuneradamente.al.menos.una.hora.en.alguna.de.las.siguientes.actividades.=="Desempleado"] <- "Desempleo o inactividad"
 colsoc$p1.trabajo <- as.factor(colsoc$Indique.si.durante.la.semana.pasada..es.decir..entre.lunes.y.domingo..trabajó.remuneradamente.al.menos.una.hora.en.alguna.de.las.siguientes.actividades.)
 label(colsoc$p1.trabajo) <- "P1. Indique si durante la semana pasada, es decir, entre lunes y domingo ¿trabajó remuneradamente al menos una hora en alguna de las siguientes actividades?"
 
@@ -18,6 +21,17 @@ colsoc$p2.horastrabajo <- as.numeric(colsoc$Si.trabajó.durante.la.semana.pasada
 label(colsoc$p2.horastrabajo) <- "P2. Si trabajó durante la semana pasada ¿cuántas horas trabajó en total?"
 
 colsoc$Si.está.trabajando..qué.tipo.de.contrato.posees.en.la.actualidad.[colsoc$Si.está.trabajando..qué.tipo.de.contrato.posees.en.la.actualidad.==""] <- NA
+colsoc$p3.contrato <- as.character(colsoc$Si.está.trabajando..qué.tipo.de.contrato.posees.en.la.actualidad.)
+colsoc$p3.contrato[colsoc$p4.otrocontrato=="compra de servicios para el Estado"] <- "Otro"
+colsoc$p3.contrato[colsoc$p4.otrocontrato=="Con contrato por servicio (sin emitir boleta)"] <- "Otro"
+colsoc$p3.contrato[colsoc$p4.otrocontrato=="contrato indefinido, contratada por mi propia empresa, pero acogida a pacto de suspensión de contrato"] <- "Otro"
+colsoc$p3.contrato[colsoc$p4.otrocontrato=="Convenio Honorarios"] <- "Contrato a honorarios"
+colsoc$p3.contrato[colsoc$p4.otrocontrato=="Estudiante de doctorado"] <- NA
+colsoc$p3.contrato[colsoc$p4.otrocontrato=="honorario"] <- "Contrato a honorarios"
+colsoc$p3.contrato[colsoc$p4.otrocontrato=="Independiente"] <- "Otro"
+colsoc$p3.contrato[colsoc$p4.otrocontrato=="Jubilado y sin dependencia"] <- "Otro"
+colsoc$p3.contrato[colsoc$p4.otrocontrato=="Reemplazo Servicio de Salud"] <- "Otro"
+colsoc$p3.contrato[colsoc$p4.otrocontrato=="Solo es una asesoría de tesis"] <- "Otro"
 colsoc$p3.contrato <- as.factor(colsoc$Si.está.trabajando..qué.tipo.de.contrato.posees.en.la.actualidad.)
 label(colsoc$p3.contrato) <- "P3. Si está trabajando ¿qué tipo de contrato posees en la actualidad?"
 
@@ -264,25 +278,31 @@ colsoc$p58.interescolegiarse <- factor(colsoc$p58.interescolegiarse, levels = c(
 label(colsoc$p58.interescolegiarse) <- "P58. ¿Es de su interés asociarse al Colegio de Sociólogas y Sociólogos de Chile A.G.?"
 
 colsoc <- colsoc[c(59:116)]
+
+colsoc$p43.boletas2018[colsoc$p43.boletas2018 > 101] <- NA
+colsoc$p43.boletas2018 <- as.numeric(colsoc$p43.boletas2018)
+colsoc$p44.boletas2019[colsoc$p44.boletas2019 > 101] <- NA
+colsoc$p45.boletas2020[colsoc$p45.boletas2020 > 101] <- NA
+colsoc$p45.boletas2020 <- as.numeric(colsoc$p45.boletas2020)
+colsoc$p55.edad[colsoc$p55.edad ==99] <- NA
 ```
 
 ```{r, include=FALSE}
 #CSV
-#write.csv2(colsoc,"/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.csv", row.names = TRUE)
+write.csv2(colsoc,"/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.csv", row.names = TRUE, fileEncoding = "UTF-8")
 
 #SPSS (SAV)
-#library(haven)
-#write_sav(colsoc, "BDcolsoc.sav")
+library(haven)
+write_sav(colsoc, "BDcolsoc.sav")
 
 #SPSS (TXT+SPS)
-#library(foreign)
+library(foreign)
 #write.foreign(colsoc, "/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.txt", "/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.sps",   package="SPSS")
 
-#STATA
-#write.dta(colsoc,"/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.dta")
-```
+#RDS
+saveRDS(object = colsoc, file = "BDcolsoc.rds")
 
-```{r}
-describe(colsoc)
+#STATA
+write.dta(colsoc,"/Users/danielquinterosr/Google Drive/Colegio sociologia/2020 Covid/BDcolsoc.dta")
 ```
 
